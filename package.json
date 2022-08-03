@@ -1,0 +1,30 @@
+{
+	"name": "3t",
+	"version": "0.0.1",
+	"description": "3t - TokensToTailwind: a bridge to automate the process of transforming design tokens to a extended tailwind-config format.",
+	"main": "index.js",
+	"scripts": {
+		"build": "style-dictionary build",
+		"transform": "token-transformer input/designtokens.json transformed/designtokens.json"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/tovobi/3t.git"
+	},
+	"keywords": [
+		"Figma Design Tokens",
+		"Tailwind",
+		"Style Dictionary",
+		"Token Transformer"
+	],
+	"author": "tovobi",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/tovobi/3t/issues"
+	},
+	"homepage": "https://github.com/tovobi/3t#readme",
+	"dependencies": {
+		"style-dictionary": "^3.7.1",
+		"token-transformer": "0.0.24"
+	}
+}

@@ -1,7 +1,7 @@
 {
 	"name": "3t",
 	"version": "0.0.1",
-	"description": "3t - TokensToTailwind: a bridge to automate the process of transforming design tokens to a extended tailwind-config format.",
+	"description": "3t - Tokens To Tailwind: a bridge to automate the process of transforming design tokens to a extended tailwind-config.",
 	"main": "index.js",
 	"scripts": {
 		"build": "style-dictionary build",

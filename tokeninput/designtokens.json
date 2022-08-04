@@ -195,7 +195,7 @@
   "light": {
     "primary": {
       "500": {
-        "value": "{seaBlue.150}",
+        "value": "{seaBlue.250}",
         "type": "color"
       }
     }

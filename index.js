@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import { DataObjectParser } from './modules/dataobject-parser.js';
-import { testFunc } from './modules/test.js';
 import { readFile, writeFile } from 'fs/promises';
 
 const tokenJson = JSON.parse(await readFile(new URL('./tokeninput/designtokens.json', import.meta.url)));
@@ -14,18 +13,14 @@ function objToDot(obj, depth = 0, parent = '', constructingObj = Object) {
     for (var keyName in obj) {
         let currentPath;
         // Der Objectpfad ohne root elemente aka themes (global, "$themes", dark, light,etc,)
-        //console.log('currenttheme:', currentTheme, '  depth:');
-
         if (depth === 0) {
             themes.push(keyName);
             currentTheme = keyName;
-            //console.log('currenttheme:', currentTheme, '  depth:', depth);
         } else if (depth === 1) {
             currentPath = keyName;
         } else if (depth > 1) {
             currentPath = parent + '.' + keyName;
         }
-        //console.log('currenttheme:', currentTheme, '  depth:', depth);
         if (!constructingObj) {
             constructingObj = { [keyName]: obj[keyName] };
         } else {
@@ -43,35 +38,8 @@ function objToDot(obj, depth = 0, parent = '', constructingObj = Object) {
             allValues.push({ [currentPath]: obj[keyName] });
         }
     }
-    console.log('pick original token format into pieces');
     return { themes, allValues };
 }
-
-// function objToDot(obj, depth = 0, parent = '', constructingObj = Object) {
-//     for (var keyName in obj) {
-//         let currentPath;
-//         // Der Objectpfad ohne root elemente aka themes (global, "$themes", dark, light,etc,)
-//         if (depth === 1) {
-//             currentPath = keyName;
-//         } else if (depth > 1) {
-//             currentPath = parent + '.' + keyName;
-//         }
-
-//         if (!constructingObj) {
-//             constructingObj = { [keyName]: obj[keyName] };
-//         } else {
-//             constructingObj.assign({ [keyName]: obj[keyName] });
-//         }
-
-//         if (obj[keyName] instanceof Object && !obj[keyName].value) {
-//             objToDot(obj[keyName], depth + 1, currentPath, constructingObj);
-//         } else {
-//             //console.log(obj, "obj[keyName]:", obj[keyName]);
-//             allValues.push({ [currentPath]: obj[keyName] });
-//         }
-//     }
-//     return allValues;
-// }
 
 const getReferenceName = (reference) => {
     return reference.substr(1, reference.length - 2);
@@ -80,7 +48,6 @@ const getReferenceName = (reference) => {
 const buildExtendedCfg = () => {
     const tokenPaths = printValues(tokenJson);
     var d = new DataObjectParser();
-    //console.log(tokenPaths);
     let bigNewObject = {};
     let currentRoot = '';
     let typeOfThisRootSet = false;
@@ -88,7 +55,6 @@ const buildExtendedCfg = () => {
     for (let index = 0; index < tokenPaths.length; index++) {
         const tokenPath = tokenPaths[index];
 
-        //console.log(Object.keys(tokenPath), tokenPath[Object.keys(tokenPath)[0]]);
         const tokenPathKey = Object.keys(tokenPath).toString();
         let value = tokenPath[Object.keys(tokenPath)[0]];
 
@@ -216,7 +182,6 @@ const getShadowObjectProps = (tokenPath, tokenPaths) => {
             shadowValue[singleTokenObjectLastElement] = singleTokenObjectValue;
         }
     });
-    console.log('parse special format for shadows');
     return `${shadowValue.type === 'innerShadow' ? 'inset' : ''} ${shadowValue.x} ${shadowValue.y} ${shadowValue.blur} ${
         shadowValue.spread
     } ${shadowValue.color}`;
@@ -231,7 +196,6 @@ const buildCssVariableObj = (includeType) => {
     let tokenOfThemes = {};
     let currentType = '';
     let currentTheme;
-    //console.log('tokenPaths:', tokenPaths);
     for (let index = 0; index < tokenPaths.length; index++) {
         let newTokenObj = {};
         const tokenPath = tokenPaths[index];
@@ -328,39 +292,6 @@ const buildCssVariableObj = (includeType) => {
     }
     console.log('object build of sorted and filtered tokens');
     return tokenOfThemes;
-};
-
-const buildCssVariables2 = (includeType) => {
-    includeType = true;
-    const tokenPaths = objToDot(tokenJson);
-    var d = new DataObjectParser();
-    //console.log(tokenPaths);
-    let bigNewObject = {};
-    let currentRoot = '';
-    let typeOfThisRootSet = false;
-    let typeOfThisRoot = '';
-    let currentType;
-    for (let index = 0; index < tokenPaths.length; index++) {
-        const tokenPath = tokenPaths[index];
-        //console.log(tokenPath);
-        //console.log(Object.keys(tokenPath), tokenPath[Object.keys(tokenPath)[0]]);
-
-        const tokenPathKey = Object.keys(tokenPath).toString().split('.').slice(0, -1).join('-');
-
-        //console.log(typeof tokenPath, tokenPath, Object.keys(tokenPath)[0]);
-        console.log(typeof tokenPath, tokenPath);
-        for (var key in tokenPath) {
-            console.log(tokenPath[key].value);
-        }
-        if (Object.keys(tokenPath)[0].value) {
-            let value = tokenPath[Object.keys(tokenPath)[0].value];
-            console.log(value);
-        }
-
-        console.log('--------\n');
-    }
-
-    //console.log(newObj, "\n", bigNewObject);
 };
 
 const createCss = (obj) => {

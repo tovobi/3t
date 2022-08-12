@@ -1,23 +1,13 @@
 {
 	"source": ["tokentransformed/**/*.json"],
 	"platforms": {
-		"scss": {
-			"transformGroup": "scss",
+		"tailwind": {
+			"transformGroup": "js",
 			"buildPath": "tokenoutput/scss/",
 			"files": [
 				{
-					"destination": "_variables.scss",
-					"format": "scss/variables"
-				}
-			]
-		},
-		"css": {
-			"transformGroup": "css",
-			"buildPath": "tokenoutput/css/",
-			"files": [
-				{
-					"destination": "_variables.css",
-					"format": "css/variables"
+					"destination": "variables.js",
+					"format": "javascript/object"
 				}
 			]
 		}

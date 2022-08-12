@@ -5,7 +5,8 @@
 	"main": "index.js",
 	"scripts": {
 		"build": "style-dictionary build",
-		"transform": "token-transformer input/designtokens.json transformed/designtokens.json"
+		"transform": "token-transformer tokeninput/designtokens.json tokentransformed/designtokens.json",
+		"start": "node index.js"
 	},
 	"repository": {
 		"type": "git",
@@ -19,11 +20,13 @@
 	],
 	"author": "tovobi",
 	"license": "ISC",
+	"type": "module",
 	"bugs": {
 		"url": "https://github.com/tovobi/3t/issues"
 	},
 	"homepage": "https://github.com/tovobi/3t#readme",
 	"dependencies": {
+		"lodash": "^4.17.21",
 		"style-dictionary": "^3.7.1",
 		"token-transformer": "0.0.24"
 	}

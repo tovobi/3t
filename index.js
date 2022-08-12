@@ -1,10 +1,10 @@
 import _ from 'lodash';
 import { DataObjectParser } from './modules/dataobject-parser.js';
 import { testFunc } from './modules/test.js';
-import { readFile } from 'fs/promises';
+import { readFile, writeFile } from 'fs/promises';
 
 const tokenJson = JSON.parse(await readFile(new URL('./tokeninput/designtokens.json', import.meta.url)));
-console.log('\n\n\n\n\n\n\n\n-----------------------------------------------------------------------------------------\n');
+console.log('\n\n-----------------------------------------------------------------------------------------\nconvert tokens to css ...\n');
 
 const tokenSets = Object.keys(tokenJson).filter((set) => set != '$themes');
 let allValues = [];
@@ -43,6 +43,7 @@ function objToDot(obj, depth = 0, parent = '', constructingObj = Object) {
             allValues.push({ [currentPath]: obj[keyName] });
         }
     }
+    console.log('pick original token format into pieces');
     return { themes, allValues };
 }
 
@@ -215,26 +216,26 @@ const getShadowObjectProps = (tokenPath, tokenPaths) => {
             shadowValue[singleTokenObjectLastElement] = singleTokenObjectValue;
         }
     });
+    console.log('parse special format for shadows');
     return `${shadowValue.type === 'innerShadow' ? 'inset' : ''} ${shadowValue.x} ${shadowValue.y} ${shadowValue.blur} ${
         shadowValue.spread
     } ${shadowValue.color}`;
 };
 
-const buildCssVariables = (includeType) => {
+const buildCssVariableObj = (includeType) => {
     includeType = true;
     const dottedObject = objToDot(tokenJson);
     const themes = dottedObject.themes;
     const tokenPaths = dottedObject.allValues;
-    var d = new DataObjectParser();
     let cssTokens = [];
-    let currentRoot = '';
-    let typeOfThisRootSet = false;
+    let tokenOfThemes = {};
     let currentType = '';
+    let currentTheme;
     //console.log('tokenPaths:', tokenPaths);
     for (let index = 0; index < tokenPaths.length; index++) {
         let newTokenObj = {};
         const tokenPath = tokenPaths[index];
-        console.log('tokenPath:', tokenPath);
+
         const tokenPathKey = Object.keys(tokenPath).toString();
         let value = tokenPath[Object.keys(tokenPath)[0]];
 
@@ -244,6 +245,11 @@ const buildCssVariables = (includeType) => {
         const secondLastElement = tokenPathElements[tokenPathElements.length - 2];
         let shadowProps;
         const tokenIsShadow = isShadowObj(lastElement, secondLastElement);
+
+        if (tokenPathKey === 'theme') {
+            value === 'global' ? (currentTheme = ':root') : (currentTheme = value);
+            cssTokens = [];
+        }
 
         /*
         wir loopen im Loop nochmal alles durch und schauen ob das 
@@ -317,11 +323,11 @@ const buildCssVariables = (includeType) => {
         });
         if (!found && Object.keys(newTokenObj).length >= 1) {
             cssTokens.push(newTokenObj);
+            tokenOfThemes[currentTheme] = cssTokens;
         }
     }
-
-    console.log(cssTokens);
-    console.log('--------\n');
+    console.log('object build of sorted and filtered tokens');
+    return tokenOfThemes;
 };
 
 const buildCssVariables2 = (includeType) => {
@@ -357,16 +363,25 @@ const buildCssVariables2 = (includeType) => {
     //console.log(newObj, "\n", bigNewObject);
 };
 
-buildCssVariables();
+const createCss = (obj) => {
+    let cssStr = '';
+    for (const [themeKey, themeValue] of Object.entries(obj)) {
+        cssStr += `${themeKey} \{\n`;
+        themeValue.forEach((element) => {
+            for (const [key, value] of Object.entries(element)) {
+                cssStr += `\t${key}: ${value};\n`;
+            }
+        });
+        cssStr += `\}\n`;
+    }
+    console.log('css format generated');
+    return cssStr;
+};
 
-// async function f() {
-// 	let promise = new Promise((resolve, reject) => {
-// 		resolve(printValues(tokenJson));
-// 	});
+const css = createCss(buildCssVariableObj());
 
-// 	let result = await promise; // wait until the promise resolves (*)
-
-// 	console.log(result); // "done!"
-// }
-
-// f();
+try {
+    await writeFile('./tokenoutput/tokenVariables.css', css); // need to be in an async function
+} catch (error) {
+    console.log(error);
+}
